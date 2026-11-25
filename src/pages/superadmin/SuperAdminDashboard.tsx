@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
 import { supabase } from '../../lib/supabase'
 import type { Profile } from '../../context/auth-context'
 import CreateAdminForm from '../../components/CreateAdminForm'
-import { Link } from 'react-router-dom'
 
 export default function SuperAdminDashboard() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [accounts, setAccounts] = useState<Profile[]>([])
   const [loadingList, setLoadingList] = useState(true)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const loadAccounts = useCallback(async () => {
     const { data } = await supabase
@@ -26,6 +26,38 @@ export default function SuperAdminDashboard() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadAccounts()
   }, [loadAccounts])
+
+  async function handleDelete(account: Profile) {
+    setDeleteError(null)
+    if (
+      !window.confirm(
+        `Delete admin "${account.username}"? This cannot be undone.`,
+      )
+    ) {
+      return
+    }
+
+    const { error } = await supabase.functions.invoke('delete-admin', {
+      body: { user_id: account.id },
+    })
+
+    if (error) {
+      let message = error.message
+      const response = (error as { context?: Response }).context
+      if (response) {
+        try {
+          const body = await response.json()
+          if (body?.error) message = body.error
+        } catch {
+          message = error.message
+        }
+      }
+      setDeleteError(message)
+      return
+    }
+
+    await loadAccounts()
+  }
 
   async function handleSignOut() {
     await signOut()
@@ -43,7 +75,10 @@ export default function SuperAdminDashboard() {
             <span className="text-sm text-slate-300">
               {profile?.full_name ?? profile?.username}
             </span>
-            <Link to="/settings" className="text-sm text-slate-300 hover:text-white">
+            <Link
+              to="/settings"
+              className="text-sm text-slate-300 hover:text-white"
+            >
               Settings
             </Link>
             <button
@@ -65,6 +100,9 @@ export default function SuperAdminDashboard() {
           <h2 className="text-lg font-semibold text-slate-800">
             Admin accounts
           </h2>
+          {deleteError && (
+            <p className="mt-2 text-sm text-red-600">{deleteError}</p>
+          )}
           {loadingList ? (
             <p className="mt-4 text-slate-600">Loading...</p>
           ) : (
@@ -75,6 +113,7 @@ export default function SuperAdminDashboard() {
                     <th className="px-4 py-3 font-medium">Username</th>
                     <th className="px-4 py-3 font-medium">Name</th>
                     <th className="px-4 py-3 font-medium">Role</th>
+                    <th className="px-4 py-3 font-medium"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -88,6 +127,16 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="px-4 py-3 text-slate-600">
                         {account.role}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {account.role === 'admin' && (
+                          <button
+                            onClick={() => handleDelete(account)}
+                            className="text-sm font-medium text-red-600 hover:text-red-700"
+                          >
+                            Delete
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
