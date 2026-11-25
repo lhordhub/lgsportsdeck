@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { supabase } from '../lib/supabase'
+import ChangePasswordForm from '../components/ChangePasswordForm'
 
 export default function AccountSettings() {
   const { profile, refreshProfile } = useAuth()
@@ -98,6 +99,7 @@ export default function AccountSettings() {
             </button>
           </form>
         </section>
+            <ChangePasswordForm />
       </main>
     </div>
   )
