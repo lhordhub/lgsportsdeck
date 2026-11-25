@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
+import { Link } from 'react-router-dom'
 
 export default function AdminDashboard() {
   const { profile, signOut } = useAuth()
@@ -21,6 +22,9 @@ export default function AdminDashboard() {
             <span className="text-sm text-emerald-100">
               {profile?.full_name ?? profile?.username}
             </span>
+            <Link to="/settings" className="text-sm text-emerald-100 hover:text-white">
+              Settings
+            </Link>
             <button
               onClick={handleSignOut}
               className="rounded-lg bg-emerald-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-900"

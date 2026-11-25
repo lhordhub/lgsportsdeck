@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
+import { Link } from 'react-router-dom'
 
 export default function PlayerHome() {
   const { profile, signOut } = useAuth()
@@ -19,6 +20,9 @@ export default function PlayerHome() {
             <span className="text-sm text-emerald-50">
               {profile?.full_name ?? profile?.username}
             </span>
+            <Link to="/settings" className="text-sm text-emerald-50 hover:text-white">
+              Settings
+            </Link>
             <button
               onClick={handleSignOut}
               className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800"
