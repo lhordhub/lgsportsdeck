@@ -37,8 +37,18 @@ export default function Login() {
       return
     }
 
+    const { data: userData } = await supabase.auth.getUser()
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userData.user?.id ?? '')
+      .single()
+
     setLoading(false)
-    navigate('/superadmin')
+
+    if (profileData?.role === 'superadmin') navigate('/superadmin')
+    else if (profileData?.role === 'admin') navigate('/admin')
+    else navigate('/player')
   }
 
   return (
