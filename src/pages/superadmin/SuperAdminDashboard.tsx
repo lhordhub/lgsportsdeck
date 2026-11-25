@@ -1,9 +1,30 @@
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
+import { supabase } from '../../lib/supabase'
+import type { Profile } from '../../context/auth-context'
+import CreateAdminForm from '../../components/CreateAdminForm'
 
 export default function SuperAdminDashboard() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const [accounts, setAccounts] = useState<Profile[]>([])
+  const [loadingList, setLoadingList] = useState(true)
+
+  const loadAccounts = useCallback(async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, username, full_name, role')
+      .in('role', ['admin', 'superadmin'])
+      .order('created_at', { ascending: true })
+    setAccounts((data as Profile[]) ?? [])
+    setLoadingList(false)
+  }, [])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadAccounts()
+  }, [loadAccounts])
 
   async function handleSignOut() {
     await signOut()
@@ -30,11 +51,47 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
-        <p className="mt-2 text-slate-600">
-          Admin account management will appear here.
-        </p>
+
+      <main className="mx-auto grid max-w-6xl gap-8 px-6 py-8 lg:grid-cols-2">
+        <section>
+          <CreateAdminForm onCreated={loadAccounts} />
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-slate-800">
+            Admin accounts
+          </h2>
+          {loadingList ? (
+            <p className="mt-4 text-slate-600">Loading...</p>
+          ) : (
+            <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-100 text-slate-600">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Username</th>
+                    <th className="px-4 py-3 font-medium">Name</th>
+                    <th className="px-4 py-3 font-medium">Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {accounts.map((account) => (
+                    <tr key={account.id} className="border-t border-slate-100">
+                      <td className="px-4 py-3 text-slate-800">
+                        {account.username}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {account.full_name ?? '-'}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {account.role}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </main>
     </div>
   )
