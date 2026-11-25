@@ -4,6 +4,7 @@ import { useAuth } from '../../context/useAuth'
 import { supabase } from '../../lib/supabase'
 import type { Profile } from '../../context/auth-context'
 import CreateAdminForm from '../../components/CreateAdminForm'
+import { Link } from 'react-router-dom'
 
 export default function SuperAdminDashboard() {
   const { profile, signOut } = useAuth()
@@ -42,6 +43,9 @@ export default function SuperAdminDashboard() {
             <span className="text-sm text-slate-300">
               {profile?.full_name ?? profile?.username}
             </span>
+            <Link to="/settings" className="text-sm text-slate-300 hover:text-white">
+              Settings
+            </Link>
             <button
               onClick={handleSignOut}
               className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-600"

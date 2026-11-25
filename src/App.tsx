@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PlayerHome from './pages/player/PlayerHome'
+import AccountSettings from './pages/AccountSettings'
 
 export default function App() {
   return (
@@ -32,6 +33,14 @@ export default function App() {
         element={
           <ProtectedRoute allowedRoles={['player', 'admin', 'superadmin']}>
             <PlayerHome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute allowedRoles={['player', 'admin', 'superadmin']}>
+            <AccountSettings />
           </ProtectedRoute>
         }
       />

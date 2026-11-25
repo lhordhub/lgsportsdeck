@@ -15,6 +15,7 @@ export interface AuthState {
   profile: Profile | null
   loading: boolean
   signOut: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthState | undefined>(undefined)
