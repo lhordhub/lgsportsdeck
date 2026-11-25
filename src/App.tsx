@@ -1,3 +1,4 @@
+import AuthCallback from './pages/AuthCallback'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -9,6 +10,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route
         path="/superadmin"
         element={

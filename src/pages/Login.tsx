@@ -51,6 +51,14 @@ export default function Login() {
     else navigate('/player')
   }
 
+  async function handleGoogleSignIn() {
+    setError(null)
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    })
+    if (googleError) setError(googleError.message)
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-emerald-600 px-4">
       <form
@@ -89,7 +97,21 @@ export default function Login() {
           disabled={loading}
           className="mt-6 w-full rounded-lg bg-emerald-600 py-2 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
-          {loading ? 'Signing in...' : 'Sign in'}
+                    {loading ? 'Signing in...' : 'Sign in'}
+        </button>
+
+        <div className="my-4 flex items-center gap-3">
+          <div className="h-px flex-1 bg-slate-200" />
+          <span className="text-xs text-slate-400">or</span>
+          <div className="h-px flex-1 bg-slate-200" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="w-full rounded-lg border border-slate-300 py-2 font-semibold text-slate-700 hover:bg-slate-50"
+        >
+          Continue with Google
         </button>
       </form>
     </div>
