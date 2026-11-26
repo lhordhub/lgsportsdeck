@@ -507,6 +507,12 @@
       "verify_jwt": false,
       "import_map": "./functions/delete-admin/deno.json",
       "entrypoint": "./functions/delete-admin/index.ts"
+    },
+    "register-player": {
+      "enabled": true,
+      "verify_jwt": false,
+      "import_map": "./functions/register-player/deno.json",
+      "entrypoint": "./functions/register-player/index.ts"
     }
   }
 }

@@ -6,11 +6,13 @@ import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PlayerHome from './pages/player/PlayerHome'
 import AccountSettings from './pages/AccountSettings'
+import Register from './pages/Register'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route
         path="/superadmin"

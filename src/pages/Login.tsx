@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+
 
 export default function Login() {
   const navigate = useNavigate()
@@ -113,6 +114,16 @@ export default function Login() {
         >
           Continue with Google
         </button>
+
+        <p className="mt-6 text-center text-sm text-slate-500">
+          First time here?{' '}
+          <Link
+            to="/register"
+            className="font-medium text-emerald-700 hover:underline"
+          >
+            Create an account
+          </Link>
+        </p>
       </form>
     </div>
   )
