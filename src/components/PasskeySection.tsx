@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { startRegistration } from '@simplewebauthn/browser'
+import { Fingerprint, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 interface PasskeyRow {
@@ -91,34 +92,45 @@ export default function PasskeySection() {
   }
 
   return (
-    <section className="mt-6 max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-800">
-        Fingerprint / Face
-      </h2>
-      <p className="mt-2 text-sm text-slate-600">
+    <section className="mt-6 mb-10 max-w-md animate-fade-up rounded-2xl border border-cream-200 bg-white p-6 shadow-sm">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-navy-900/10 text-navy-800">
+          <Fingerprint className="h-5 w-5" />
+        </span>
+        <div>
+          <h2 className="text-lg font-bold text-navy-900">
+            Fingerprint / Face
+          </h2>
+          <p className="text-sm text-slate-500">Sign in without a password</p>
+        </div>
+      </div>
+
+      <p className="mt-5 text-sm text-slate-600">
         Add your fingerprint or face on this device so you can sign in without
         typing a password.
       </p>
 
       {checking ? (
-        <p className="mt-4 text-sm text-slate-600">Checking...</p>
+        <p className="mt-4 text-sm text-slate-500">Checking...</p>
       ) : (
         passkeys.length > 0 && (
           <ul className="mt-4 space-y-2">
             {passkeys.map((p, index) => (
               <li
                 key={p.id}
-                className="flex items-center justify-between rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700"
+                className="flex items-center justify-between rounded-xl bg-cream-100 px-3 py-2 text-sm text-navy-800"
               >
-                <span>
+                <span className="flex items-center gap-2">
+                  <Fingerprint className="h-4 w-4 text-orange-500" />
                   Fingerprint/Face {index + 1} ·{' '}
                   {new Date(p.created_at).toLocaleDateString()}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleRemove(p.id)}
-                  className="font-medium text-red-600 hover:text-red-700"
+                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-red-600 transition hover:bg-red-50"
                 >
+                  <Trash2 className="h-4 w-4" />
                   Remove
                 </button>
               </li>
@@ -127,15 +139,24 @@ export default function PasskeySection() {
         )
       )}
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-3 text-sm text-emerald-700">{success}</p>}
+      {error && (
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {success}
+        </p>
+      )}
 
       <button
         type="button"
         onClick={handleAdd}
         disabled={loading}
-        className="mt-4 w-full rounded-lg border border-slate-300 py-2 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        className="bg-brand-gradient shadow-glow mt-5 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-display text-base font-bold text-navy-900 transition hover:-translate-y-0.5 hover:brightness-105 disabled:opacity-60"
       >
+        <Fingerprint className="h-5 w-5" />
         {loading ? 'Waiting for fingerprint/face...' : 'Add fingerprint/face'}
       </button>
     </section>

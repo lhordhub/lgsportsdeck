@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { Lock, Shield, User, UserPlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 interface CreateAdminFormProps {
@@ -58,67 +59,100 @@ export default function CreateAdminForm({ onCreated }: CreateAdminFormProps) {
     onCreated()
   }
 
+  const inputClass =
+    'w-full rounded-xl border border-slate-200 bg-cream-50 py-3 pl-11 pr-3 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-500/15'
+  const iconClass =
+    'pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400'
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="w-full rounded-2xl border border-cream-200 bg-white p-6 shadow-sm"
     >
-      <h3 className="text-lg font-semibold text-slate-800">
-        Create account
-      </h3>
+      <div className="flex items-center gap-3">
+        <span className="bg-brand-gradient flex h-11 w-11 items-center justify-center rounded-xl text-navy-900">
+          <UserPlus className="h-5 w-5" />
+        </span>
+        <div>
+          <h3 className="text-lg font-bold text-navy-900">Create account</h3>
+          <p className="text-sm text-slate-500">Add an admin or super admin</p>
+        </div>
+      </div>
 
-      <label className="mt-4 block text-sm font-medium text-slate-700">
+      <label className="mt-5 block text-sm font-medium text-navy-800">
         Username
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600"
-        />
+        <div className="relative mt-1">
+          <User className={iconClass} />
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className={inputClass}
+          />
+        </div>
       </label>
 
-      <label className="mt-4 block text-sm font-medium text-slate-700">
+      <label className="mt-4 block text-sm font-medium text-navy-800">
         Full name
-        <input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600"
-        />
+        <div className="relative mt-1">
+          <User className={iconClass} />
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={inputClass}
+          />
+        </div>
       </label>
 
-      <label className="mt-4 block text-sm font-medium text-slate-700">
+      <label className="mt-4 block text-sm font-medium text-navy-800">
         Temporary password
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600"
-        />
+        <div className="relative mt-1">
+          <Lock className={iconClass} />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            className={inputClass}
+          />
+        </div>
       </label>
 
-      <label className="mt-4 block text-sm font-medium text-slate-700">
+      <label className="mt-4 block text-sm font-medium text-navy-800">
         Role
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value as 'admin' | 'superadmin')}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-600"
-        >
-          <option value="admin">Admin</option>
-          <option value="superadmin">Super admin</option>
-        </select>
+        <div className="relative mt-1">
+          <Shield className={iconClass} />
+          <select
+            value={role}
+            onChange={(e) =>
+              setRole(e.target.value as 'admin' | 'superadmin')
+            }
+            className={inputClass}
+          >
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super admin</option>
+          </select>
+        </div>
       </label>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-4 text-sm text-emerald-700">{success}</p>}
+      {error && (
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {success}
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={loading}
-        className="mt-6 w-full rounded-lg bg-emerald-600 py-2 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+        className="bg-brand-gradient shadow-glow mt-6 w-full rounded-xl py-3 font-display text-base font-bold text-navy-900 transition hover:-translate-y-0.5 hover:brightness-105 disabled:opacity-60"
       >
         {loading ? 'Creating...' : 'Create account'}
       </button>
