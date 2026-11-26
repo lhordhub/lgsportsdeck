@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { startAuthentication } from '@simplewebauthn/browser'
 
 
 export default function Login() {
@@ -60,6 +61,46 @@ export default function Login() {
     })
     if (googleError) setError(googleError.message)
   }
+  async function handleFingerprintSignIn() {
+    setError(null)
+    setLoading(true)
+
+    try {
+      const { data: start, error: startError } =
+        await supabase.functions.invoke('passkey', {
+          body: { action: 'login-options' },
+        })
+      if (startError) throw new Error('Could not start fingerprint/face sign-in')
+
+      const response = await startAuthentication({
+        optionsJSON: start.options,
+      })
+
+      const { data: result, error: verifyError } =
+        await supabase.functions.invoke('passkey', {
+          body: {
+            action: 'login-verify',
+            challenge_id: start.challenge_id,
+            response,
+          },
+        })
+      if (verifyError || !result?.token_hash) {
+        throw new Error('Fingerprint/face sign-in failed')
+      }
+
+      const { error: otpError } = await supabase.auth.verifyOtp({
+        token_hash: result.token_hash,
+        type: 'magiclink',
+      })
+      if (otpError) throw new Error(otpError.message)
+
+      navigate('/auth/callback')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="flex min-h-screen items-center justify-center bg-emerald-600 px-4">
       <form
@@ -113,6 +154,14 @@ export default function Login() {
           className="w-full rounded-lg border border-slate-300 py-2 font-semibold text-slate-700 hover:bg-slate-50"
         >
           Continue with Google
+        </button>
+        <button
+          type="button"
+          onClick={handleFingerprintSignIn}
+          disabled={loading}
+          className="mt-3 w-full rounded-lg border border-slate-300 py-2 font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        >
+          Sign in with fingerprint/face
         </button>
 
         <p className="mt-6 text-center text-sm text-slate-500">

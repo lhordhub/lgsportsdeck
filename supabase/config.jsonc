@@ -513,6 +513,12 @@
       "verify_jwt": false,
       "import_map": "./functions/register-player/deno.json",
       "entrypoint": "./functions/register-player/index.ts"
+    },
+    "passkey": {
+      "enabled": true,
+      "verify_jwt": false,
+      "import_map": "./functions/passkey/deno.json",
+      "entrypoint": "./functions/passkey/index.ts"
     }
   }
 }

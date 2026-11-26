@@ -5,6 +5,7 @@ import { useAuth } from '../context/useAuth'
 import { supabase } from '../lib/supabase'
 import ChangePasswordForm from '../components/ChangePasswordForm'
 import LinkGoogleSection from '../components/LinkGoogleSection'
+import PasskeySection from '../components/PasskeySection'
 
 export default function AccountSettings() {
   const { profile, refreshProfile } = useAuth()
@@ -102,6 +103,7 @@ export default function AccountSettings() {
         </section>
             <ChangePasswordForm />
             <LinkGoogleSection />
+            <PasskeySection />
       </main>
     </div>
   )
