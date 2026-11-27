@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ShieldCheck, Trash2, UserCog, Users } from 'lucide-react'
+import { ShieldCheck, Trash2, Trophy, UserCog, Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { Profile } from '../../context/auth-context'
 import CreateAdminForm from '../../components/CreateAdminForm'
@@ -7,16 +7,24 @@ import DashboardHeader from '../../components/DashboardHeader'
 
 export default function SuperAdminDashboard() {
   const [accounts, setAccounts] = useState<Profile[]>([])
+  const [playerCount, setPlayerCount] = useState(0)
   const [loadingList, setLoadingList] = useState(true)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const loadAccounts = useCallback(async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, username, full_name, role')
-      .in('role', ['admin', 'superadmin'])
-      .order('created_at', { ascending: true })
-    setAccounts((data as Profile[]) ?? [])
+    const [accountsResult, playersResult] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('id, username, full_name, role')
+        .in('role', ['admin', 'superadmin'])
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'player'),
+    ])
+    setAccounts((accountsResult.data as Profile[]) ?? [])
+    setPlayerCount(playersResult.count ?? 0)
     setLoadingList(false)
   }, [])
 
@@ -59,6 +67,34 @@ export default function SuperAdminDashboard() {
 
   const adminCount = accounts.filter((a) => a.role === 'admin').length
   const superAdminCount = accounts.filter((a) => a.role === 'superadmin').length
+  const totalUsers = accounts.length + playerCount
+
+  const stats = [
+    {
+      label: 'Total users',
+      value: totalUsers,
+      icon: Users,
+      tone: 'bg-gold-400/20 text-gold-600',
+    },
+    {
+      label: 'Players',
+      value: playerCount,
+      icon: Trophy,
+      tone: 'bg-emerald-500/15 text-emerald-600',
+    },
+    {
+      label: 'Admins',
+      value: adminCount,
+      icon: UserCog,
+      tone: 'bg-orange-500/15 text-orange-600',
+    },
+    {
+      label: 'Super admins',
+      value: superAdminCount,
+      icon: ShieldCheck,
+      tone: 'bg-navy-900/10 text-navy-800',
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -74,48 +110,27 @@ export default function SuperAdminDashboard() {
           </p>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="animate-fade-up rounded-2xl border border-cream-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-400/20 text-gold-600">
-                <Users className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-sm text-slate-500">Total accounts</p>
-                <p className="font-display text-2xl font-bold text-navy-900">
-                  {accounts.length}
-                </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map(({ label, value, icon: Icon, tone }) => (
+            <div
+              key={label}
+              className="animate-fade-up rounded-2xl border border-cream-200 bg-white p-5 shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                <span
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${tone}`}
+                >
+                  <Icon className="h-6 w-6" />
+                </span>
+                <div>
+                  <p className="text-sm text-slate-500">{label}</p>
+                  <p className="font-display text-2xl font-bold text-navy-900">
+                    {value}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="animate-fade-up rounded-2xl border border-cream-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600">
-                <UserCog className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-sm text-slate-500">Admins</p>
-                <p className="font-display text-2xl font-bold text-navy-900">
-                  {adminCount}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="animate-fade-up rounded-2xl border border-cream-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy-900/10 text-navy-800">
-                <ShieldCheck className="h-6 w-6" />
-              </span>
-              <div>
-                <p className="text-sm text-slate-500">Super admins</p>
-                <p className="font-display text-2xl font-bold text-navy-900">
-                  {superAdminCount}
-                </p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
